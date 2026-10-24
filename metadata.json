@@ -1,0 +1,6 @@
+{
+  "name": "Сервис форм отклика для студентов",
+  "description": "Конструктор форм для менеджеров стажировок и страница заполнения анкет для студентов",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

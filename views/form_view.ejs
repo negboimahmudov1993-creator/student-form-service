@@ -1,0 +1,265 @@
+<%- include('partials/header', { title: form.title }) %>
+
+<!-- Sticky progress bar in Tally style -->
+<div class="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-slate-200">
+  <div class="max-w-2xl mx-auto px-4 h-12 flex items-center justify-between">
+    <div class="flex items-center gap-2">
+      <span class="w-2.5 h-2.5 rounded-full <%= isExpired ? 'bg-rose-500' : (form.status === 'paused' ? 'bg-amber-500' : 'bg-indigo-600') %>"></span>
+      <span class="text-xs font-medium text-slate-700 truncate max-w-[200px] sm:max-w-xs"><%= form.title %></span>
+    </div>
+    
+    <% if (!isExpired && form.status !== 'paused') { %>
+      <div class="flex items-center gap-2">
+        <span id="progress-text" class="text-xs text-slate-500 font-medium">0% заполнено</span>
+        <div class="w-20 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+          <div id="progress-bar-fill" class="bg-indigo-600 h-1.5 rounded-full transition-all duration-300" style="width: 0%;"></div>
+        </div>
+      </div>
+    <% } else { %>
+      <span class="text-xs font-semibold <%= isExpired ? 'text-rose-600' : 'text-amber-600' %>">
+        <%= isExpired ? 'Прием закрыт (дедлайн)' : 'Прием приостановлен' %>
+      </span>
+    <% } %>
+  </div>
+</div>
+
+<main class="max-w-2xl mx-auto px-4 py-8 sm:py-12 flex-1 w-full space-y-6">
+
+  <!-- Form Cover & Header Card -->
+  <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 sm:p-8 space-y-3">
+    
+    <div class="flex items-center justify-between flex-wrap gap-2">
+      <div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700">
+        <span>✦</span> <%= form.category || 'Стажировка' %>
+      </div>
+
+      <% if (form.deadline) { %>
+        <div class="text-xs font-medium px-2.5 py-1 rounded-full flex items-center gap-1 <%= isExpired ? 'bg-rose-50 text-rose-700 border border-rose-200' : 'bg-slate-100 text-slate-700' %>">
+          <span>⏰</span>
+          <span>Дедлайн: <%= new Date(form.deadline).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) %></span>
+        </div>
+      <% } %>
+    </div>
+
+    <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+      <%= form.title %>
+    </h1>
+
+    <!-- Markdown Formatted Description -->
+    <% if (form.description) { %>
+      <div class="text-slate-600 text-sm leading-relaxed pt-2 border-t border-slate-100 mt-3 prose prose-slate max-w-none">
+        <%- renderMarkdown(form.description) %>
+      </div>
+    <% } %>
+
+    <div class="flex items-center gap-2 pt-2 text-xs text-slate-400">
+      <span>Ориентировочное время: ~2-3 минуты</span>
+      <span>•</span>
+      <span>Поля со звездочкой (<span class="text-rose-500 font-semibold">*</span>) обязательны</span>
+    </div>
+  </div>
+
+  <!-- State 1: Deadline Exceeded (Locked Form) -->
+  <% if (isExpired) { %>
+    <div class="bg-rose-50/80 border-2 border-rose-200 rounded-xl p-8 text-center space-y-3 shadow-xs animate-fade-in">
+      <div class="w-14 h-14 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-xs">
+        ⏰
+      </div>
+      <h2 class="text-xl font-bold text-rose-950">Прием откликов на эту вакансию завершен</h2>
+      <p class="text-xs text-rose-800 max-w-md mx-auto leading-relaxed">
+        Срок подачи анкет истек <%= new Date(form.deadline).toLocaleString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>.
+        Заполнение и отправка формы заблокированы организатором.
+      </p>
+    </div>
+
+  <!-- State 2: Manually Paused by Manager -->
+  <% } else if (form.status === 'paused') { %>
+    <div class="bg-amber-50/80 border-2 border-amber-200 rounded-xl p-8 text-center space-y-3 shadow-xs animate-fade-in">
+      <div class="w-14 h-14 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mx-auto text-2xl shadow-xs">
+        ⏸️
+      </div>
+      <h2 class="text-xl font-bold text-amber-950">Прием откликов приостановлен</h2>
+      <p class="text-xs text-amber-800 max-w-md mx-auto leading-relaxed">
+        Набор кандидатов по этой вакансии временно приостановлен менеджером стажировки.
+      </p>
+    </div>
+
+  <!-- State 3: Active Form (Open for submissions) -->
+  <% } else { %>
+    <form id="student-form" method="POST" action="/forms/<%= form.id %>" onsubmit="return handleFormSubmit();" class="space-y-5">
+      
+      <% (form.questions || []).forEach(function(q, index) { %>
+        <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 space-y-3 transition-all hover:border-slate-300 question-block" data-question-id="<%= q.id %>" data-required="<%= q.required ? 'true' : 'false' %>">
+          
+          <div class="flex items-start justify-between gap-2">
+            <label class="block text-sm font-semibold text-slate-900 leading-snug">
+              <span class="text-xs font-mono text-slate-400 mr-1"><%= index + 1 %>.</span>
+              <%= q.label %>
+              <% if (q.required) { %>
+                <span class="text-rose-500 font-bold ml-0.5" title="Обязательный вопрос">*</span>
+              <% } %>
+            </label>
+          </div>
+
+          <!-- Question inputs based on type -->
+          <% if (q.type === 'text') { %>
+            <input 
+              type="text" 
+              name="q_<%= q.id %>" 
+              id="input_<%= q.id %>"
+              <%= q.required ? 'required' : '' %>
+              placeholder="<%= q.placeholder || 'Ваш ответ' %>"
+              oninput="trackProgress()"
+              class="w-full border border-slate-300 rounded-lg p-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            >
+          <% } else if (q.type === 'email') { %>
+            <input 
+              type="email" 
+              name="q_<%= q.id %>" 
+              id="input_<%= q.id %>"
+              <%= q.required ? 'required' : '' %>
+              placeholder="<%= q.placeholder || 'name@example.com' %>"
+              oninput="trackProgress()"
+              class="w-full border border-slate-300 rounded-lg p-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            >
+          <% } else if (q.type === 'number') { %>
+            <input 
+              type="number" 
+              name="q_<%= q.id %>" 
+              id="input_<%= q.id %>"
+              <%= q.required ? 'required' : '' %>
+              placeholder="<%= q.placeholder || '0' %>"
+              oninput="trackProgress()"
+              class="w-full border border-slate-300 rounded-lg p-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            >
+          <% } else if (q.type === 'textarea') { %>
+            <textarea 
+              name="q_<%= q.id %>" 
+              id="input_<%= q.id %>"
+              rows="4"
+              <%= q.required ? 'required' : '' %>
+              placeholder="<%= q.placeholder || 'Напишите ваш ответ здесь...' %>"
+              oninput="trackProgress()"
+              class="w-full border border-slate-300 rounded-lg p-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition leading-relaxed"
+            ></textarea>
+          <% } else if (q.type === 'select') { %>
+            <select 
+              name="q_<%= q.id %>" 
+              id="input_<%= q.id %>"
+              <%= q.required ? 'required' : '' %>
+              onchange="trackProgress()"
+              class="w-full border border-slate-300 rounded-lg p-2.5 text-sm text-slate-800 bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+            >
+              <option value="" disabled selected>— Выберите вариант из списка —</option>
+              <% (q.options || []).forEach(function(opt) { %>
+                <option value="<%= opt %>"><%= opt %></option>
+              <% }); %>
+            </select>
+          <% } else if (q.type === 'radio') { %>
+            <div class="space-y-2 pt-1">
+              <% (q.options || []).forEach(function(opt, optIdx) { %>
+                <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/20 cursor-pointer transition select-none">
+                  <input 
+                    type="radio" 
+                    name="q_<%= q.id %>" 
+                    value="<%= opt %>" 
+                    <%= q.required && optIdx === 0 ? '' : '' %>
+                    onchange="trackProgress()"
+                    class="w-4 h-4 text-indigo-600 border-slate-300 focus:ring-indigo-500"
+                  >
+                  <span class="text-sm text-slate-800"><%= opt %></span>
+                </label>
+              <% }); %>
+            </div>
+          <% } else if (q.type === 'checkbox') { %>
+            <div class="space-y-2 pt-1">
+              <% (q.options || []).forEach(function(opt) { %>
+                <label class="flex items-center gap-3 p-3 rounded-lg border border-slate-200 hover:border-indigo-300 hover:bg-indigo-50/20 cursor-pointer transition select-none">
+                  <input 
+                    type="checkbox" 
+                    name="q_<%= q.id %>" 
+                    value="<%= opt %>" 
+                    onchange="trackProgress()"
+                    class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                  >
+                  <span class="text-sm text-slate-800"><%= opt %></span>
+                </label>
+              <% }); %>
+            </div>
+          <% } %>
+
+        </div>
+      <% }); %>
+
+      <!-- Submit Section -->
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="text-xs text-slate-500 text-center sm:text-left">
+          Нажимая кнопку, вы соглашаетесь на обработку анкетных данных для отклика
+        </div>
+
+        <button 
+          type="submit" 
+          id="submit-btn"
+          class="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white font-semibold text-sm px-8 py-3 rounded-lg transition shadow-sm cursor-pointer"
+        >
+          <span id="btn-text">Отправить отклик</span>
+          <svg id="btn-icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+        </button>
+      </div>
+
+    </form>
+  <% } %>
+
+</main>
+
+<script>
+  function trackProgress() {
+    const blocks = document.querySelectorAll('.question-block');
+    if (!blocks.length) return;
+
+    let filledCount = 0;
+
+    blocks.forEach(block => {
+      const qId = block.getAttribute('data-question-id');
+      const textInputs = block.querySelectorAll(`input[type="text"], input[type="email"], input[type="number"], textarea`);
+      const selectInputs = block.querySelectorAll(`select`);
+      const radioInputs = block.querySelectorAll(`input[type="radio"]:checked`);
+      const checkInputs = block.querySelectorAll(`input[type="checkbox"]:checked`);
+
+      let isAnswered = false;
+
+      if (textInputs.length && textInputs[0].value.trim() !== '') {
+        isAnswered = true;
+      } else if (selectInputs.length && selectInputs[0].value !== '') {
+        isAnswered = true;
+      } else if (radioInputs.length > 0) {
+        isAnswered = true;
+      } else if (checkInputs.length > 0) {
+        isAnswered = true;
+      }
+
+      if (isAnswered) filledCount++;
+    });
+
+    const percent = Math.round((filledCount / blocks.length) * 100);
+    const fillEl = document.getElementById('progress-bar-fill');
+    const textEl = document.getElementById('progress-text');
+    if (fillEl) fillEl.style.width = percent + '%';
+    if (textEl) textEl.textContent = `${percent}% заполнено (${filledCount}/${blocks.length})`;
+  }
+
+  function handleFormSubmit() {
+    const btn = document.getElementById('submit-btn');
+    const text = document.getElementById('btn-text');
+    if (btn && text) {
+      btn.disabled = true;
+      btn.classList.add('opacity-75', 'cursor-not-allowed');
+      text.textContent = 'Отправка отклика...';
+    }
+    return true;
+  }
+
+  document.addEventListener('DOMContentLoaded', trackProgress);
+</script>
+
+<%- include('partials/footer') %>

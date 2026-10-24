@@ -1,0 +1,313 @@
+<%- include('partials/header', { title: 'Панель менеджера | Формы стажировок' }) %>
+
+<!-- Admin Navigation -->
+<header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white shadow-sm font-bold text-lg">
+        ✦
+      </div>
+      <div>
+        <div class="flex items-center gap-2">
+          <h1 class="text-base font-semibold text-slate-900 leading-tight">Карьерные Формы</h1>
+          <span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded font-mono">v1.2</span>
+        </div>
+        <p class="text-xs text-slate-500">Панель управления откликами студентов</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <a href="/admin/forms/new" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-medium px-4 py-2 rounded-lg transition shadow-sm">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+        Создать форму
+      </a>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full">
+  
+  <!-- Flash Alerts -->
+  <% if (typeof query !== 'undefined' && query.created) { %>
+    <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm rounded-xl flex items-center justify-between animate-fade-in">
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Новая форма успешно создана и готова к публикации!</span>
+      </div>
+      <span class="text-xs text-emerald-600">Ссылка уже активна</span>
+    </div>
+  <% } %>
+
+  <% if (typeof query !== 'undefined' && query.deleted) { %>
+    <div class="mb-6 p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-xl flex items-center gap-2">
+      <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+      <span>Форма и связанные отклики успешно удалены.</span>
+    </div>
+  <% } %>
+
+  <% if (typeof query !== 'undefined' && query.updated) { %>
+    <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm rounded-xl flex items-center justify-between animate-fade-in">
+      <div class="flex items-center gap-2">
+        <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        <span>Форма успешно обновлена! Все изменения сохранены.</span>
+      </div>
+      <span class="text-xs text-emerald-600">Отклики сохранены</span>
+    </div>
+  <% } %>
+
+
+
+  <% if (typeof query !== 'undefined' && query.status_changed) { %>
+    <div class="mb-6 p-4 bg-blue-50 border border-blue-200 text-blue-800 text-sm rounded-xl flex items-center gap-2">
+      <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+      <span>Статус приема откликов успешно обновлен.</span>
+    </div>
+  <% } %>
+
+  <!-- Context & Stats Overview -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
+      <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Всего форм</div>
+      <div class="text-2xl font-bold text-slate-900"><%= allFormsCount %></div>
+      <div class="text-xs text-slate-400 mt-1">активных сценариев</div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
+      <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Получено откликов</div>
+      <div class="text-2xl font-bold text-indigo-600"><%= totalResponses %></div>
+      <div class="text-xs text-slate-400 mt-1">от студентов</div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
+      <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Просмотры форм</div>
+      <div class="text-2xl font-bold text-slate-900"><%= totalViews %></div>
+      <div class="text-xs text-slate-400 mt-1">уникальных переходов</div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
+      <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Средняя конверсия</div>
+      <div class="text-2xl font-bold <%= overallConversion >= 20 ? 'text-emerald-600' : 'text-slate-900' %>">
+        <%= overallConversion %>%
+      </div>
+      <div class="text-xs text-slate-400 mt-1">доля заполнивших до конца</div>
+    </div>
+  </div>
+
+  <!-- Section Header & Manager Filter -->
+  <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+    <div>
+      <h2 class="text-lg font-bold text-slate-900">Формы откликов и регистраций</h2>
+      <p class="text-sm text-slate-500">Управляйте вопросами, делитесь публичной ссылкой и анализируйте отклики</p>
+    </div>
+    
+    <!-- Filter by Manager / Author -->
+    <div class="flex items-center gap-2 self-stretch sm:self-auto">
+      <div class="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-1.5 shadow-2xs">
+        <span class="text-xs text-slate-400 font-medium">Менеджер:</span>
+        <select onchange="window.location.href = '/admin?author=' + encodeURIComponent(this.value)" class="text-xs font-semibold text-slate-700 bg-transparent focus:outline-hidden cursor-pointer">
+          <option value="all" <%= currentAuthor === 'all' ? 'selected' : '' %>>Все менеджеры (<%= allFormsCount %>)</option>
+          <% authors.forEach(function(auth) { %>
+            <option value="<%= auth %>" <%= currentAuthor === auth ? 'selected' : '' %>><%= auth %></option>
+          <% }); %>
+        </select>
+      </div>
+
+      <a href="/admin/forms/new" class="text-xs font-medium text-indigo-600 hover:text-indigo-700 bg-indigo-50 hover:bg-indigo-100 px-3 py-2 rounded-lg transition inline-flex items-center gap-1.5">
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+        Новая форма
+      </a>
+    </div>
+  </div>
+
+  <!-- Forms List -->
+  <% if (forms.length === 0) { %>
+    <div class="bg-white rounded-2xl border border-slate-200 p-12 text-center max-w-lg mx-auto shadow-xs my-8">
+      <div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 mx-auto flex items-center justify-center text-2xl mb-4">
+        📋
+      </div>
+      <h3 class="text-base font-semibold text-slate-900 mb-1">Форм по данному фильтру не найдено</h3>
+      <p class="text-sm text-slate-500 mb-6">Создайте новую форму или сбросьте фильтр менеджера.</p>
+      <div class="flex items-center justify-center gap-3">
+        <a href="/admin" class="text-xs text-slate-600 hover:text-slate-900 bg-slate-100 px-4 py-2 rounded-lg font-medium transition">Сбросить фильтр</a>
+        <a href="/admin/forms/new" class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium px-4 py-2 rounded-lg transition shadow-sm">
+          Создать форму
+        </a>
+      </div>
+    </div>
+  <% } else { %>
+    <div class="space-y-4">
+      <% forms.forEach(function(form) { %>
+        <% 
+          const formResponses = responsesByForm[form.id] || [];
+          const count = formResponses.length;
+          const views = form.views || 0;
+          const conversion = views > 0 ? Math.round((count / views) * 100) : 0;
+          const publicUrl = baseUrl + '/forms/' + form.id;
+          const isPaused = form.status === 'paused';
+        %>
+        <div class="bg-white rounded-xl border border-slate-200 shadow-xs hover:border-slate-300 transition-all p-5 sm:p-6 <%= isPaused ? 'opacity-90 bg-slate-50/50' : '' %>">
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+            
+            <!-- Left Info -->
+            <div class="space-y-2 flex-1 min-w-0">
+              <div class="flex items-center flex-wrap gap-2">
+                
+                <!-- Status Badge -->
+                <% if (isPaused) { %>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                    Прием приостановлен
+                  </span>
+                <% } else { %>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Прием активен
+                  </span>
+                <% } %>
+
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-50 text-indigo-700 border border-indigo-100">
+                  <%= form.category || 'Стажировка' %>
+                </span>
+
+                <!-- Author / Manager Tag -->
+                <span class="px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-700 border border-slate-200">
+                  👤 <%= form.author || 'HR-менеджер' %>
+                </span>
+
+                <% if (form.deadline) { %>
+                  <% const isExp = isFormExpired(form); %>
+                  <span class="px-2.5 py-0.5 rounded-full text-xs font-medium border flex items-center gap-1 <%= isExp ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-slate-100 text-slate-700 border-slate-200' %>">
+                    ⏰ Дедлайн: <%= new Date(form.deadline).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) %>
+                    <% if (isExp) { %><span class="font-bold text-rose-600">(истек)</span><% } %>
+                  </span>
+                <% } %>
+
+                <span class="text-xs text-slate-400">
+                  <%= new Date(form.createdAt).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }) %>
+                </span>
+
+                <span class="text-xs text-slate-500 font-medium">
+                  • <%= form.questions ? form.questions.length : 0 %> вопр.
+                </span>
+              </div>
+
+              <h3 class="text-base font-semibold text-slate-900 hover:text-indigo-600 transition">
+                <a href="/admin/forms/<%= form.id %>/responses"><%= form.title %></a>
+              </h3>
+
+              <% if (form.description) { %>
+                <p class="text-sm text-slate-500 line-clamp-2 max-w-3xl leading-relaxed">
+                  <%= form.description %>
+                </p>
+              <% } %>
+
+              <!-- Public URL Box with quick copy -->
+              <div class="pt-2 flex items-center gap-2 max-w-xl">
+                <div class="flex-1 bg-slate-50 border border-slate-200 rounded-lg px-3 py-1.5 text-xs text-slate-600 font-mono truncate select-all">
+                  <%= publicUrl %>
+                </div>
+                <button 
+                  type="button" 
+                  onclick="copyToClipboard('<%= publicUrl %>', 'Ссылка на форму скопирована!')" 
+                  class="shrink-0 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium transition inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                  title="Скопировать ссылку для отправки студентам"
+                >
+                  <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                  Копировать
+                </button>
+                <a 
+                  href="/forms/<%= form.id %>" 
+                  target="_blank"
+                  class="shrink-0 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium transition inline-flex items-center gap-1.5 cursor-pointer shadow-2xs"
+                  title="Открыть форму в новой вкладке так, как видит студент"
+                >
+                  <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+                  Открыть
+                </a>
+              </div>
+            </div>
+
+            <!-- Right Stats & Actions -->
+            <div class="flex flex-col sm:flex-row lg:flex-col items-start lg:items-end justify-between gap-4 pt-4 lg:pt-0 border-t lg:border-t-0 border-slate-100">
+              
+              <!-- Quick Stats -->
+              <div class="flex items-center gap-3 text-center">
+                <div class="px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-100">
+                  <div class="text-[11px] text-slate-400 font-medium">Просмотры</div>
+                  <div class="text-sm font-bold text-slate-800"><%= views %></div>
+                </div>
+                <div class="px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-100">
+                  <div class="text-[11px] text-slate-400 font-medium">Отклики</div>
+                  <div class="text-sm font-bold text-indigo-600"><%= count %></div>
+                </div>
+                <div class="px-2.5 py-1.5 rounded-lg bg-slate-50 border border-slate-100">
+                  <div class="text-[11px] text-slate-400 font-medium">Конверсия</div>
+                  <div class="text-sm font-bold <%= conversion >= 20 ? 'text-emerald-600' : 'text-slate-800' %>">
+                    <%= conversion %>%
+                  </div>
+                </div>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex items-center gap-2 w-full sm:w-auto flex-wrap">
+                
+                <!-- Toggle Pause/Resume Submissions -->
+                <form method="POST" action="/admin/forms/<%= form.id %>/toggle-status" class="inline">
+                  <button 
+                    type="submit" 
+                    class="text-xs font-medium px-3 py-2 rounded-lg border transition shadow-2xs cursor-pointer inline-flex items-center gap-1.5 <%= isPaused ? 'bg-amber-50 text-amber-800 border-amber-200 hover:bg-amber-100' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50' %>"
+                    title="<%= isPaused ? 'Возобновить прием откликов' : 'Приостановить прием новых откликов' %>"
+                  >
+                    <% if (isPaused) { %>
+                      <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      Возобновить
+                    <% } else { %>
+                      <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                      Пауза
+                    <% } %>
+                  </button>
+                </form>
+
+                <!-- Edit Form Button -->
+                <a 
+                  href="/admin/forms/<%= form.id %>/edit" 
+                  class="inline-flex items-center justify-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-semibold px-3 py-2 rounded-lg transition shadow-2xs"
+                  title="Редактировать форму и вопросы"
+                >
+                  <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                  Редактировать
+                </a>
+
+                <!-- View Responses -->
+                <a 
+                  href="/admin/forms/<%= form.id %>/responses" 
+                  class="inline-flex items-center justify-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition shadow-2xs"
+                >
+                  <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                  Ответы (<%= count %>)
+                </a>
+
+                <!-- Direct Free Delete Form Button for Managers -->
+                <form method="POST" action="/admin/forms/<%= form.id %>/delete" class="inline">
+                  <button 
+                    type="submit" 
+                    class="p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition border border-transparent hover:border-rose-200 cursor-pointer" 
+                    title="Удалить форму"
+                  >
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                  </button>
+                </form>
+
+              </div>
+
+            </div>
+
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  <% } %>
+
+</main>
+
+<%- include('partials/footer') %>

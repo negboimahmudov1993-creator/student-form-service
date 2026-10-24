@@ -1,0 +1,56 @@
+<%- include('partials/header', { title: 'Спасибо за отклик! | Карьерный сервис' }) %>
+
+<main class="max-w-xl mx-auto px-4 py-16 sm:py-24 flex-1 w-full flex items-center justify-center">
+
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-8 sm:p-10 text-center space-y-6 w-full animate-fade-in">
+    
+    <!-- Success Badge -->
+    <div class="w-16 h-16 rounded-2xl bg-emerald-50 text-emerald-600 mx-auto flex items-center justify-center shadow-xs">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+    </div>
+
+    <!-- Title & Description -->
+    <div class="space-y-2">
+      <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-700">
+        Успешно отправлено
+      </div>
+      <h1 class="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
+        Спасибо за отклик!
+      </h1>
+      <p class="text-sm text-slate-500 max-w-md mx-auto leading-relaxed">
+        Ваша анкета по вакансии <span class="font-semibold text-slate-700">«<%= form.title %>»</span> успешно получена и передана менеджеру стажировок.
+      </p>
+    </div>
+
+    <!-- Submission Details Box -->
+    <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-4 text-xs text-slate-600 text-left space-y-2">
+      <div class="flex items-center justify-between">
+        <span class="text-slate-400">Номер отклика:</span>
+        <span class="font-mono font-medium text-slate-700"><%= responseId || 'Зафиксирован' %></span>
+      </div>
+      <div class="flex items-center justify-between">
+        <span class="text-slate-400">Время регистрации:</span>
+        <span class="font-medium text-slate-700"><%= new Date().toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %></span>
+      </div>
+      <div class="flex items-center justify-between border-t border-slate-200/60 pt-2">
+        <span class="text-slate-400">Что дальше?</span>
+        <span class="text-emerald-700 font-medium">С вами свяжутся в течение 2-3 рабочих дней</span>
+      </div>
+    </div>
+
+    <!-- Action for Student (no admin panel link) -->
+    <div class="pt-2 flex items-center justify-center">
+      <a 
+        href="/forms/<%= form.id %>" 
+        class="inline-flex items-center justify-center gap-2 bg-white hover:bg-slate-50 text-slate-700 border border-slate-300 text-xs font-semibold px-5 py-2.5 rounded-lg transition shadow-2xs"
+      >
+        <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+        Отправить еще один ответ
+      </a>
+    </div>
+
+  </div>
+
+</main>
+
+<%- include('partials/footer') %>

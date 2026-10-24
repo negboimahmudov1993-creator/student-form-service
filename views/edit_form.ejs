@@ -1,0 +1,438 @@
+<%- include('partials/header', { title: 'Редактирование: ' + form.title + ' | Карьерный сервис' }) %>
+
+<header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="/admin" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition" title="Назад к списку">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      </a>
+      <div class="min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-medium">Редактирование</span>
+          <h1 class="text-base font-semibold text-slate-900 truncate max-w-sm sm:max-w-md"><%= form.title %></h1>
+        </div>
+        <p class="text-xs text-slate-500">Изменение вопросов, дедлайна и описания</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-2">
+      <a href="/admin" class="text-xs font-medium text-slate-600 hover:text-slate-900 px-3 py-2 rounded-lg transition">
+        Отмена
+      </a>
+      <button 
+        type="submit" 
+        form="edit-form-form" 
+        class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-xs font-semibold px-4 py-2 rounded-lg transition shadow-sm cursor-pointer"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        Сохранить изменения
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full">
+
+  <form id="edit-form-form" method="POST" action="/admin/forms/<%= form.id %>/edit" onsubmit="return validateBeforeSubmit();" class="space-y-6">
+
+    <!-- Card 1: Basic Information -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500">1. Основная информация</h2>
+        <span class="text-xs text-slate-400 font-mono">ID: <%= form.id %></span>
+      </div>
+      
+      <div class="space-y-1.5">
+        <label for="form-title" class="block text-xs font-medium text-slate-700">
+          Название формы / вакансии <span class="text-rose-500">*</span>
+        </label>
+        <input 
+          type="text" 
+          id="form-title" 
+          name="title" 
+          value="<%= form.title %>"
+          required 
+          placeholder="Например: Отклик на оплачиваемую стажировку: Junior QA Engineer"
+          class="w-full border border-slate-300 rounded-lg p-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+        >
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="sm:col-span-2 space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label for="form-description" class="block text-xs font-medium text-slate-700">
+              Описание для студентов
+            </label>
+            <span class="text-[11px] text-indigo-600 font-medium">✨ Поддерживает Markdown (**жирный**, списки -, ссылки)</span>
+          </div>
+          <textarea 
+            id="form-description" 
+            name="description" 
+            rows="4" 
+            placeholder="Опишите условия, стек, задачи или информацию о мероприятии..."
+            class="w-full border border-slate-300 rounded-lg p-2.5 text-sm text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition font-mono text-xs"
+          ><%= form.description || '' %></textarea>
+        </div>
+
+        <div class="space-y-1.5">
+          <label for="form-category" class="block text-xs font-medium text-slate-700">
+            Категория / Тег
+          </label>
+          <select 
+            id="form-category" 
+            name="category" 
+            class="w-full border border-slate-300 rounded-lg p-2.5 text-sm text-slate-800 bg-white focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+          >
+            <option value="Стажировка" <%= (form.category === 'Стажировка') ? 'selected' : '' %>>Стажировка</option>
+            <option value="Мероприятие" <%= (form.category === 'Мероприятие') ? 'selected' : '' %>>Мероприятие</option>
+            <option value="Хакатон" <%= (form.category === 'Хакатон') ? 'selected' : '' %>>Хакатон</option>
+            <option value="Воркшоп" <%= (form.category === 'Воркшоп') ? 'selected' : '' %>>Воркшоп</option>
+            <option value="Карьерная консультация" <%= (form.category === 'Карьерная консультация') ? 'selected' : '' %>>Консультация</option>
+            <option value="Опрос" <%= (form.category === 'Опрос') ? 'selected' : '' %>>Опрос</option>
+          </select>
+          <p class="text-[11px] text-slate-400">Отображается в карточке формы</p>
+        </div>
+      </div>
+
+      <!-- Settings: Deadline & Manager -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-3 border-t border-slate-100">
+        
+        <!-- Deadline Date & Time -->
+        <div class="space-y-1.5">
+          <div class="flex items-center justify-between">
+            <label for="form-deadline" class="block text-xs font-medium text-slate-700">
+              ⏰ Дата и время дедлайна (дата закрытия)
+            </label>
+            <span class="text-[10px] text-slate-400">необязательно</span>
+          </div>
+          <input 
+            type="datetime-local" 
+            id="form-deadline" 
+            name="deadline" 
+            value="<%= form.deadline || '' %>"
+            class="w-full border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+          >
+          <p class="text-[11px] text-slate-400">После дедлайна форма автоматически заблокируется для новых откликов</p>
+        </div>
+
+        <!-- Responsible Manager / Author -->
+        <div class="space-y-1.5">
+          <label for="form-author" class="block text-xs font-medium text-slate-700">
+            👤 Ответственный менеджер / автор формы
+          </label>
+          <input 
+            type="text" 
+            id="form-author" 
+            name="author" 
+            value="<%= form.author || 'HR-менеджер' %>"
+            placeholder="ФИО или должность менеджера"
+            class="w-full border border-slate-300 rounded-lg p-2.5 text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+          >
+          <div class="flex items-center gap-1.5 text-[11px] text-slate-500 flex-wrap">
+            <span>Быстрый выбор:</span>
+            <button type="button" onclick="document.getElementById('form-author').value = 'Анна Смирнова (HR Lead)'" class="text-indigo-600 hover:underline">Анна (HR)</button>
+            <span>•</span>
+            <button type="button" onclick="document.getElementById('form-author').value = 'Михаил Ковалев (Tech Lead)'" class="text-indigo-600 hover:underline">Михаил (Dev)</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Card 2: Question Builder -->
+    <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-xs space-y-4">
+      <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+        <div>
+          <h2 class="text-sm font-semibold uppercase tracking-wider text-slate-500">2. Вопросы анкеты</h2>
+          <p class="text-xs text-slate-400">Изменяйте формулировки, типы ответов, порядок или добавляйте новые вопросы</p>
+        </div>
+        <span id="questions-counter" class="text-xs font-medium bg-slate-100 text-slate-700 px-2.5 py-1 rounded-full">
+          <%= (form.questions || []).length %> вопросов
+        </span>
+      </div>
+
+      <!-- Container for dynamic questions -->
+      <div id="questions-container" class="space-y-4">
+        <!-- Rendered dynamically by JS -->
+      </div>
+
+      <!-- Add Question Button -->
+      <div class="pt-2">
+        <button 
+          type="button" 
+          onclick="addQuestion()" 
+          class="w-full py-3 px-4 border-2 border-dashed border-slate-300 hover:border-indigo-400 hover:bg-indigo-50/40 rounded-xl text-slate-600 hover:text-indigo-600 text-sm font-medium flex items-center justify-center gap-2 transition cursor-pointer"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+          Добавить новый вопрос в форму
+        </button>
+      </div>
+    </div>
+
+    <!-- Hidden input to store JSON of questions -->
+    <input type="hidden" name="questionsJson" id="questionsJson">
+
+    <!-- Bottom Action Bar -->
+    <div class="flex items-center justify-between pt-2">
+      <a href="/admin" class="text-sm font-medium text-slate-500 hover:text-slate-800">
+        ← Отменить и вернуться
+      </a>
+      <button 
+        type="submit" 
+        class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 active:bg-indigo-800 text-white text-sm font-semibold px-6 py-2.5 rounded-lg transition shadow-sm cursor-pointer"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        Сохранить изменения
+      </button>
+    </div>
+
+  </form>
+
+</main>
+
+<script>
+  let questions = <%- JSON.stringify(form.questions || []) %>;
+
+  const QUESTION_TYPES = [
+    { value: 'text', label: 'Короткий текст' },
+    { value: 'textarea', label: 'Развернутый ответ' },
+    { value: 'email', label: 'Email адрес' },
+    { value: 'select', label: 'Выпадающий список (Select)' },
+    { value: 'radio', label: 'Один из списка (Radio)' },
+    { value: 'checkbox', label: 'Несколько из списка (Checkboxes)' },
+    { value: 'number', label: 'Число (например, курс)' }
+  ];
+
+  function generateId() {
+    return 'q_' + Math.random().toString(36).substring(2, 9);
+  }
+
+  function addQuestion(initialData = null) {
+    const q = initialData || {
+      id: generateId(),
+      label: '',
+      type: 'text',
+      required: true,
+      placeholder: '',
+      options: ['Вариант 1', 'Вариант 2']
+    };
+    questions.push(q);
+    renderQuestions();
+    updateCounter();
+  }
+
+  function removeQuestion(index) {
+    questions.splice(index, 1);
+    renderQuestions();
+    updateCounter();
+    if (typeof showToast === 'function') showToast('Вопрос удален');
+  }
+
+  function moveQuestion(index, direction) {
+    const target = index + direction;
+    if (target < 0 || target >= questions.length) return;
+    const temp = questions[index];
+    questions[index] = questions[target];
+    questions[target] = temp;
+    renderQuestions();
+  }
+
+  function updateQuestion(index, key, value) {
+    questions[index][key] = value;
+    if (key === 'type') {
+      renderQuestions();
+    }
+  }
+
+  function addOption(qIndex) {
+    if (!questions[qIndex].options) questions[qIndex].options = [];
+    questions[qIndex].options.push('Новый вариант ' + (questions[qIndex].options.length + 1));
+    renderQuestions();
+  }
+
+  function updateOption(qIndex, optIndex, value) {
+    questions[qIndex].options[optIndex] = value;
+  }
+
+  function removeOption(qIndex, optIndex) {
+    if (questions[qIndex].options.length <= 1) {
+      if (typeof showToast === 'function') {
+        showToast('Вопрос с выбором должен содержать хотя бы один вариант');
+      }
+      return;
+    }
+    questions[qIndex].options.splice(optIndex, 1);
+    renderQuestions();
+  }
+
+  function updateCounter() {
+    const el = document.getElementById('questions-counter');
+    if (el) el.textContent = questions.length + ' ' + getPlural(questions.length, ['вопрос', 'вопроса', 'вопросов']);
+  }
+
+  function getPlural(n, forms) {
+    const pr = new Intl.PluralRules('ru-RU');
+    const rule = pr.select(n);
+    if (rule === 'one') return forms[0];
+    if (rule === 'few') return forms[1];
+    return forms[2];
+  }
+
+  function renderQuestions() {
+    const container = document.getElementById('questions-container');
+    if (!container) return;
+
+    if (questions.length === 0) {
+      container.innerHTML = `
+        <div class="p-8 text-center bg-slate-50 border border-slate-200 border-dashed rounded-xl text-slate-400 text-sm">
+          В форме пока нет вопросов. Нажмите кнопку ниже, чтобы добавить первый вопрос.
+        </div>
+      `;
+      return;
+    }
+
+    container.innerHTML = questions.map((q, idx) => {
+      const isChoiceType = ['select', 'radio', 'checkbox'].includes(q.type);
+
+      return `
+        <div class="p-4 sm:p-5 rounded-xl border border-slate-200 bg-slate-50/70 hover:border-slate-300 transition space-y-3.5 relative">
+          
+          <!-- Top Row: Number, Reorder, Delete -->
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+              <span class="w-6 h-6 rounded-md bg-indigo-600 text-white text-xs font-bold flex items-center justify-center">
+                ${idx + 1}
+              </span>
+              <span class="text-xs font-semibold text-slate-700">Вопрос #${idx + 1}</span>
+            </div>
+
+            <div class="flex items-center gap-1">
+              <button type="button" onclick="moveQuestion(${idx}, -1)" ${idx === 0 ? 'disabled class="p-1 text-slate-300 cursor-not-allowed"' : 'class="p-1 text-slate-500 hover:text-slate-800 rounded hover:bg-slate-200 transition cursor-pointer"'} title="Переместить выше">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"/></svg>
+              </button>
+              <button type="button" onclick="moveQuestion(${idx}, 1)" ${idx === questions.length - 1 ? 'disabled class="p-1 text-slate-300 cursor-not-allowed"' : 'class="p-1 text-slate-500 hover:text-slate-800 rounded hover:bg-slate-200 transition cursor-pointer"'} title="Переместить ниже">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              </button>
+              <button type="button" onclick="removeQuestion(${idx})" class="p-1 text-slate-400 hover:text-rose-600 rounded hover:bg-rose-50 transition cursor-pointer" title="Удалить вопрос">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Middle Row: Question Title & Type -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div class="sm:col-span-2 space-y-1">
+              <label class="block text-[11px] font-medium text-slate-600">Текст вопроса</label>
+              <input 
+                type="text" 
+                value="${escapeHtml(q.label || '')}" 
+                oninput="updateQuestion(${idx}, 'label', this.value)" 
+                placeholder="Например: В каком городе вы проживаете?" 
+                class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+              >
+            </div>
+
+            <div class="space-y-1">
+              <label class="block text-[11px] font-medium text-slate-600">Тип ответа</label>
+              <select 
+                onchange="updateQuestion(${idx}, 'type', this.value)" 
+                class="w-full bg-white border border-slate-300 rounded-lg p-2 text-sm text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+              >
+                ${QUESTION_TYPES.map(t => `<option value="${t.value}" ${q.type === t.value ? 'selected' : ''}>${t.label}</option>`).join('')}
+              </select>
+            </div>
+          </div>
+
+          <!-- Placeholder & Required Settings -->
+          <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-center">
+            <div class="sm:col-span-2 space-y-1">
+              <label class="block text-[11px] font-medium text-slate-600">Подсказка в поле (placeholder)</label>
+              <input 
+                type="text" 
+                value="${escapeHtml(q.placeholder || '')}" 
+                oninput="updateQuestion(${idx}, 'placeholder', this.value)" 
+                placeholder="Необязательная подсказка для студента" 
+                class="w-full bg-white border border-slate-300 rounded-lg p-2 text-xs text-slate-700 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition"
+              >
+            </div>
+
+            <div class="pt-4 flex items-center">
+              <label class="inline-flex items-center gap-2 cursor-pointer select-none">
+                <input 
+                  type="checkbox" 
+                  ${q.required ? 'checked' : ''} 
+                  onchange="updateQuestion(${idx}, 'required', this.checked)" 
+                  class="w-4 h-4 text-indigo-600 rounded border-slate-300 focus:ring-indigo-500"
+                >
+                <span class="text-xs font-medium text-slate-700">Обязательный ответ</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Options Editor for Select / Radio / Checkbox -->
+          ${isChoiceType ? `
+            <div class="pt-3 border-t border-slate-200/80 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-xs font-semibold text-slate-700">Варианты ответов</span>
+                <button type="button" onclick="addOption(${idx})" class="text-xs text-indigo-600 hover:text-indigo-800 font-medium inline-flex items-center gap-1 cursor-pointer">
+                  + Добавить вариант
+                </button>
+              </div>
+              <div class="space-y-1.5">
+                ${(q.options || ['Вариант 1']).map((opt, optIdx) => `
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs text-slate-400 w-4 text-center">${optIdx + 1}.</span>
+                    <input 
+                      type="text" 
+                      value="${escapeHtml(opt)}" 
+                      oninput="updateOption(${idx}, ${optIdx}, this.value)" 
+                      class="flex-1 bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs text-slate-800 focus:outline-hidden focus:ring-2 focus:ring-indigo-500"
+                    >
+                    <button type="button" onclick="removeOption(${idx}, ${optIdx})" class="p-1 text-slate-400 hover:text-rose-500 rounded cursor-pointer" title="Удалить вариант">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          ` : ''}
+
+        </div>
+      `;
+    }).join('');
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  function validateBeforeSubmit() {
+    const title = document.getElementById('form-title').value.trim();
+    if (!title) {
+      if (typeof showToast === 'function') showToast('Пожалуйста, укажите название формы');
+      document.getElementById('form-title').focus();
+      return false;
+    }
+
+    if (questions.length === 0) {
+      if (typeof showToast === 'function') showToast('В форме должен быть хотя бы один вопрос');
+      return false;
+    }
+
+    for (let i = 0; i < questions.length; i++) {
+      if (!questions[i].label || !questions[i].label.trim()) {
+        if (typeof showToast === 'function') showToast(`Пожалуйста, введите текст для вопроса #${i + 1}`);
+        return false;
+      }
+    }
+
+    document.getElementById('questionsJson').value = JSON.stringify(questions);
+    return true;
+  }
+
+  // Render questions immediately on load
+  renderQuestions();
+  updateCounter();
+</script>
+
+<%- include('partials/footer') %>

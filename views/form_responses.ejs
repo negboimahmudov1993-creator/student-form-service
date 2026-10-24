@@ -1,0 +1,534 @@
+<%- include('partials/header', { title: 'Ответы: ' + form.title + ' | Карьерный сервис' }) %>
+
+<header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="/admin" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-lg transition" title="Назад к панели">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+      </a>
+      <div class="min-w-0">
+        <div class="flex items-center gap-2">
+          <span class="text-xs px-2 py-0.5 rounded-full bg-indigo-50 text-indigo-700 font-medium">Отклики</span>
+          <h1 class="text-base font-semibold text-slate-900 truncate"><%= form.title %></h1>
+        </div>
+        <p class="text-xs text-slate-500">Собрано <%= responses.length %> откликов студентов</p>
+      </div>
+    </div>
+    
+    <div class="flex items-center gap-2">
+      <a 
+        href="/admin/forms/<%= form.id %>/edit" 
+        class="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium px-3.5 py-2 rounded-lg transition shadow-2xs cursor-pointer"
+        title="Редактировать форму и вопросы"
+      >
+        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+        Редактировать форму
+      </a>
+
+      <a 
+        href="/admin/forms/<%= form.id %>/export.csv" 
+        class="inline-flex items-center gap-1.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 text-xs font-medium px-3.5 py-2 rounded-lg transition shadow-2xs cursor-pointer"
+        title="Выгрузить ответы в формате CSV для Excel"
+      >
+        <svg class="w-4 h-4 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+        Экспорт в CSV
+      </a>
+
+      <button 
+        type="button" 
+        onclick="copyToClipboard('<%= baseUrl %>/forms/<%= form.id %>', 'Ссылка на форму скопирована!')" 
+        class="inline-flex items-center gap-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold px-3.5 py-2 rounded-lg transition shadow-2xs cursor-pointer"
+      >
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+        Копировать ссылку
+      </button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 flex-1 w-full space-y-6">
+
+  <% if (typeof query !== 'undefined' && query.deleted_resp) { %>
+    <div class="p-4 bg-amber-50 border border-amber-200 text-amber-800 text-sm rounded-xl flex items-center gap-2 animate-fade-in">
+      <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+      <span>Отклик кандидата успешно удален.</span>
+    </div>
+  <% } %>
+
+  <!-- Analytics and Drop-off Overview Cards -->
+  <div class="grid grid-cols-1 sm:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
+      <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Просмотры анкеты</div>
+      <div class="text-2xl font-bold text-slate-900"><%= form.views || 0 %></div>
+      <div class="text-xs text-slate-400 mt-1">студентов перешли по ссылке</div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
+      <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Всего откликов</div>
+      <div class="text-2xl font-bold text-indigo-600"><%= responses.length %></div>
+      <div class="text-xs text-slate-400 mt-1">заполненных анкет</div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
+      <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Конверсия формы</div>
+      <% const conv = (form.views && form.views > 0) ? Math.round((responses.length / form.views) * 100) : 0; %>
+      <div class="text-2xl font-bold <%= conv >= 20 ? 'text-emerald-600' : 'text-slate-900' %>">
+        <%= conv %>%
+      </div>
+      <div class="text-xs text-slate-400 mt-1">
+        <%= conv >= 20 ? 'Хорошая конверсия' : 'Рекомендуется упростить вопросы' %>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
+      <div class="text-xs font-medium text-slate-500 uppercase tracking-wider mb-1">Дедлайн приема</div>
+      <% if (form.deadline) { %>
+        <% const isExp = isFormExpired(form); %>
+        <div class="text-sm font-bold <%= isExp ? 'text-rose-600' : 'text-slate-800' %> truncate">
+          <%= new Date(form.deadline).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) %>
+        </div>
+        <div class="text-xs mt-1 <%= isExp ? 'text-rose-500 font-semibold' : 'text-emerald-600' %>">
+          <%= isExp ? '⏰ Дедлайн прошел' : '🟢 Прием открыт' %>
+        </div>
+      <% } else { %>
+        <div class="text-sm font-semibold text-slate-700">Бессрочно</div>
+        <div class="text-xs text-slate-400 mt-1">дедлайн не установлен</div>
+      <% } %>
+    </div>
+  </div>
+
+  <!-- Form Info Banner with link -->
+  <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="space-y-1">
+      <div class="flex items-center gap-2">
+        <span class="text-xs font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-600"><%= form.category || 'Стажировка' %></span>
+        <span class="text-xs text-slate-400">Куратор: <%= form.author || 'HR' %></span>
+      </div>
+      <div class="text-xs text-slate-600"><%= form.title %></div>
+    </div>
+
+    <div class="flex items-center gap-2">
+      <a 
+        href="/forms/<%= form.id %>" 
+        target="_blank" 
+        class="text-xs font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition inline-flex items-center gap-1.5"
+      >
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/></svg>
+        Открыть страницу студента
+      </a>
+    </div>
+  </div>
+
+  <!-- Responses Section with Search & Status Filters -->
+  <div class="bg-white rounded-xl border border-slate-200 shadow-xs overflow-hidden">
+    
+    <!-- Header of table with title & counter -->
+    <div class="p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div>
+        <h2 class="text-sm font-bold text-slate-900">Список полученных откликов</h2>
+        <p class="text-xs text-slate-400">Управляйте статусами кандидатов и фильтруйте ответы</p>
+      </div>
+      <span id="counter-badge" class="text-xs font-medium bg-slate-100 text-slate-600 px-2.5 py-1 rounded-full self-start sm:self-auto">
+        <%= responses.length %> записей
+      </span>
+    </div>
+
+    <!-- Search & Filters Toolbar -->
+    <div class="p-4 bg-slate-50/70 border-b border-slate-200 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-3">
+      
+      <!-- Search Input -->
+      <div class="relative flex-1 max-w-md">
+        <svg class="w-4 h-4 text-slate-400 absolute left-3 top-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
+        <input 
+          type="text" 
+          id="search-input" 
+          oninput="applyFilter()" 
+          placeholder="Поиск по имени, email или тексту ответа..."
+          class="w-full pl-9 pr-8 py-2 text-xs bg-white border border-slate-300 rounded-lg text-slate-800 placeholder-slate-400 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition shadow-2xs"
+        >
+        <button 
+          type="button" 
+          id="clear-search" 
+          onclick="clearSearchInput()" 
+          class="hidden absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600 text-xs cursor-pointer"
+        >✕</button>
+      </div>
+
+      <!-- Status Filter Dropdown -->
+      <div class="flex items-center gap-2">
+        <span class="text-xs text-slate-500 font-medium shrink-0">Статус:</span>
+        <select 
+          id="status-filter" 
+          onchange="applyFilter()" 
+          class="text-xs font-medium text-slate-800 bg-white border border-slate-300 rounded-lg px-3 py-2 focus:outline-hidden focus:ring-2 focus:ring-indigo-500 transition shadow-2xs cursor-pointer"
+        >
+          <option value="all">Все статусы (<%= responses.length %>)</option>
+          <option value="new">🟡 Новые</option>
+          <option value="reviewing">🔵 На рассмотрении</option>
+          <option value="invited">🟢 Приглашены</option>
+          <option value="rejected">🔴 Отказ</option>
+        </select>
+      </div>
+
+    </div>
+
+    <% if (responses.length === 0) { %>
+      <div class="p-12 text-center text-slate-400">
+        <div class="text-3xl mb-3">📭</div>
+        <p class="text-sm font-medium text-slate-700">Пока нет откликов по этой форме</p>
+        <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">
+          Отправьте студентам ссылку на анкету или откройте её самостоятельно для тестового заполнения.
+        </p>
+        <div class="mt-4">
+          <a href="/forms/<%= form.id %>" target="_blank" class="inline-flex items-center gap-1.5 bg-indigo-600 text-white text-xs font-medium px-4 py-2 rounded-lg hover:bg-indigo-700 transition">
+            Заполнить тестовый отклик
+          </a>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-sm" id="responses-table">
+          <thead>
+            <tr class="bg-slate-50 text-slate-500 text-xs font-semibold border-b border-slate-200">
+              <th class="py-3 px-4">#</th>
+              <th class="py-3 px-4">Дата и время</th>
+              <th class="py-3 px-4">Статус кандидата</th>
+              <% 
+                // Display first 3 questions as columns
+                const previewCols = (form.questions || []).slice(0, 3);
+                previewCols.forEach(q => { 
+              %>
+                <th class="py-3 px-4 max-w-xs truncate"><%= q.label %></th>
+              <% }); %>
+              <th class="py-3 px-4 text-right">Действие</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-100 text-slate-700">
+            <% responses.forEach(function(resp, index) { 
+              const currentStatus = resp.status || 'new';
+              // Build full searchable text string
+              const allAnswersText = Object.values(resp.answers || {}).map(v => Array.isArray(v) ? v.join(' ') : String(v)).join(' ');
+              const searchText = (resp.id + ' ' + allAnswersText).toLowerCase();
+            %>
+              <tr 
+                class="hover:bg-slate-50/80 transition response-row" 
+                data-row-id="<%= resp.id %>" 
+                data-status="<%= currentStatus %>"
+                data-search="<%= searchText %>"
+              >
+                <td class="py-3.5 px-4 text-xs font-mono text-slate-400 row-index">
+                  <%= index + 1 %>
+                </td>
+                <td class="py-3.5 px-4 text-xs whitespace-nowrap text-slate-600">
+                  <%= new Date(resp.submittedAt).toLocaleString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) %>
+                </td>
+
+                <!-- Interactive Candidate Status Select -->
+                <td class="py-3.5 px-4 whitespace-nowrap">
+                  <select 
+                    id="status-select-<%= resp.id %>"
+                    onchange="changeCandidateStatus('<%= resp.id %>', this.value, this)" 
+                    class="status-dropdown text-xs font-semibold rounded-lg px-2.5 py-1.5 border transition shadow-2xs cursor-pointer focus:outline-hidden focus:ring-2 focus:ring-indigo-500 <%= 
+                      currentStatus === 'new' ? 'bg-amber-50 text-amber-800 border-amber-200' :
+                      currentStatus === 'reviewing' ? 'bg-blue-50 text-blue-800 border-blue-200' :
+                      currentStatus === 'invited' ? 'bg-emerald-50 text-emerald-800 border-emerald-200' :
+                      'bg-rose-50 text-rose-800 border-rose-200'
+                    %>"
+                  >
+                    <option value="new" <%= currentStatus === 'new' ? 'selected' : '' %>>🟡 Новый</option>
+                    <option value="reviewing" <%= currentStatus === 'reviewing' ? 'selected' : '' %>>🔵 На рассмотрении</option>
+                    <option value="invited" <%= currentStatus === 'invited' ? 'selected' : '' %>>🟢 Приглашен</option>
+                    <option value="rejected" <%= currentStatus === 'rejected' ? 'selected' : '' %>>🔴 Отказ</option>
+                  </select>
+                </td>
+
+                <% previewCols.forEach(q => { 
+                  let ans = resp.answers[q.id];
+                  if (Array.isArray(ans)) ans = ans.join(', ');
+                %>
+                  <td class="py-3.5 px-4 text-xs max-w-xs truncate font-medium text-slate-900">
+                    <%= ans || '—' %>
+                  </td>
+                <% }); %>
+
+                <td class="py-3.5 px-4 text-right whitespace-nowrap">
+                  <div class="inline-flex items-center gap-1.5 justify-end">
+                    <button 
+                      type="button" 
+                      onclick='openDetailsModal(<%- JSON.stringify(resp) %>)' 
+                      class="text-xs font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-3 py-1.5 rounded-lg transition cursor-pointer"
+                    >
+                      Вся анкета →
+                    </button>
+                    <form method="POST" action="/admin/responses/<%= resp.id %>/delete" class="inline">
+                      <button 
+                        type="submit" 
+                        class="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition border border-transparent hover:border-rose-200 cursor-pointer" 
+                        title="Удалить отклик"
+                      >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+
+        <!-- Empty Filter Results State -->
+        <div id="no-search-results" class="hidden p-8 text-center text-slate-400 text-xs">
+          Ни один отклик не соответствует заданным параметрам поиска или фильтра.
+          <button type="button" onclick="resetFilters()" class="text-indigo-600 hover:underline font-medium ml-1 cursor-pointer">
+            Сбросить фильтры
+          </button>
+        </div>
+
+      </div>
+    <% } %>
+  </div>
+
+  <!-- Question Completion Breakdown (Insights for low conversion) -->
+  <div class="bg-white rounded-xl border border-slate-200 p-5 shadow-xs">
+    <div class="flex items-center justify-between mb-4">
+      <div>
+        <h3 class="text-sm font-bold text-slate-900">Аналитика заполняемости вопросов</h3>
+        <p class="text-xs text-slate-400">Помогает обнаружить сложные вопросы, на которых студенты могут бросать форму</p>
+      </div>
+      <span class="text-xs text-slate-500 font-medium">Всего вопросов: <%= (form.questions || []).length %></span>
+    </div>
+
+    <div class="space-y-3">
+      <% (form.questions || []).forEach(function(q, qIdx) { 
+        let filledCount = 0;
+        responses.forEach(r => {
+          const val = r.answers[q.id];
+          if (val !== undefined && val !== null && val !== '' && !(Array.isArray(val) && val.length === 0)) {
+            filledCount++;
+          }
+        });
+        const percent = responses.length > 0 ? Math.round((filledCount / responses.length) * 100) : 0;
+      %>
+        <div class="space-y-1">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-700 font-medium truncate max-w-md">
+              <span class="text-slate-400 mr-1.5">#<%= qIdx + 1 %></span> <%= q.label %> 
+              <% if (q.required) { %><span class="text-rose-500">*</span><% } %>
+            </span>
+            <span class="text-slate-500 font-mono"><%= filledCount %> / <%= responses.length %> (<%= percent %>%)</span>
+          </div>
+          <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+            <div class="bg-indigo-600 h-1.5 rounded-full transition-all duration-500" style="width: <%= percent %>%;"></div>
+          </div>
+        </div>
+      <% }); %>
+    </div>
+  </div>
+
+</main>
+
+<!-- Detailed Response Modal -->
+<div id="details-modal" class="fixed inset-0 z-50 hidden bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] flex flex-col shadow-xl border border-slate-200 overflow-hidden animate-scale-in">
+    
+    <!-- Modal Header -->
+    <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+      <div>
+        <div class="flex items-center gap-2">
+          <h3 class="text-base font-bold text-slate-900">Анкета студента</h3>
+          <span id="modal-status-badge" class="text-xs px-2.5 py-0.5 rounded-full font-semibold"></span>
+        </div>
+        <p id="modal-date" class="text-xs text-slate-400"></p>
+      </div>
+      <button type="button" onclick="closeDetailsModal()" class="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-lg cursor-pointer transition">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+      </button>
+    </div>
+
+    <!-- Modal Body -->
+    <div id="modal-content" class="p-6 overflow-y-auto space-y-4">
+      <!-- Populated via JS -->
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="px-6 py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+      <span class="text-xs text-slate-400 font-mono" id="modal-resp-id"></span>
+      <div class="flex items-center gap-2">
+        <form id="modal-delete-form" method="POST" action="" class="inline">
+          <button type="submit" class="bg-white hover:bg-rose-50 text-rose-600 hover:text-rose-700 border border-slate-200 hover:border-rose-300 text-xs font-semibold px-3.5 py-2 rounded-lg transition cursor-pointer inline-flex items-center gap-1.5 shadow-2xs">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
+            Удалить отклик
+          </button>
+        </form>
+        <button type="button" onclick="closeDetailsModal()" class="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 text-xs font-semibold px-4 py-2 rounded-lg transition cursor-pointer shadow-2xs">
+          Закрыть
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const formQuestions = <%- JSON.stringify(form.questions || []) %>;
+  const STATUS_CLASSES = {
+    new: 'bg-amber-50 text-amber-800 border-amber-200',
+    reviewing: 'bg-blue-50 text-blue-800 border-blue-200',
+    invited: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+    rejected: 'bg-rose-50 text-rose-800 border-rose-200'
+  };
+  const STATUS_LABELS = {
+    new: '🟡 Новый',
+    reviewing: '🔵 На рассмотрении',
+    invited: '🟢 Приглашен',
+    rejected: '🔴 Отказ'
+  };
+
+  // Change candidate status asynchronously
+  function changeCandidateStatus(respId, newStatus, selectElement) {
+    // Optimistic style change
+    selectElement.className = 'status-dropdown text-xs font-semibold rounded-lg px-2.5 py-1.5 border transition shadow-2xs cursor-pointer focus:outline-hidden focus:ring-2 focus:ring-indigo-500 ' + STATUS_CLASSES[newStatus];
+
+    fetch('/admin/responses/' + respId + '/status', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ status: newStatus })
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        showToast('Статус кандидата сохранен: ' + STATUS_LABELS[newStatus]);
+        const row = document.querySelector(`.response-row[data-row-id="${respId}"]`);
+        if (row) {
+          row.setAttribute('data-status', newStatus);
+        }
+        applyFilter();
+      } else {
+        showToast('Ошибка при сохранении статуса');
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      showToast('Ошибка сети при сохранении');
+    });
+  }
+
+  // Client-side instant Search & Filter
+  function applyFilter() {
+    const searchInput = document.getElementById('search-input');
+    const query = searchInput ? searchInput.value.trim().toLowerCase() : '';
+    const statusFilter = document.getElementById('status-filter').value;
+    const clearBtn = document.getElementById('clear-search');
+    
+    if (clearBtn) {
+      if (query) clearBtn.classList.remove('hidden');
+      else clearBtn.classList.add('hidden');
+    }
+
+    const rows = document.querySelectorAll('.response-row');
+    let visibleCount = 0;
+
+    rows.forEach(row => {
+      const rowStatus = row.getAttribute('data-status');
+      const rowSearchText = row.getAttribute('data-search') || '';
+
+      const matchesStatus = (statusFilter === 'all' || rowStatus === statusFilter);
+      const matchesSearch = (!query || rowSearchText.includes(query));
+
+      if (matchesStatus && matchesSearch) {
+        row.style.display = '';
+        visibleCount++;
+      } else {
+        row.style.display = 'none';
+      }
+    });
+
+    const noResultsEl = document.getElementById('no-search-results');
+    if (noResultsEl) {
+      noResultsEl.style.display = visibleCount === 0 && rows.length > 0 ? 'block' : 'none';
+    }
+
+    const counterBadge = document.getElementById('counter-badge');
+    if (counterBadge) {
+      counterBadge.textContent = `${visibleCount} из ${rows.length} откликов`;
+    }
+  }
+
+  function clearSearchInput() {
+    const input = document.getElementById('search-input');
+    if (input) input.value = '';
+    applyFilter();
+    if (input) input.focus();
+  }
+
+  function resetFilters() {
+    const input = document.getElementById('search-input');
+    const select = document.getElementById('status-filter');
+    if (input) input.value = '';
+    if (select) select.value = 'all';
+    applyFilter();
+  }
+
+  function openDetailsModal(resp) {
+    const modal = document.getElementById('details-modal');
+    const dateEl = document.getElementById('modal-date');
+    const contentEl = document.getElementById('modal-content');
+    const idEl = document.getElementById('modal-resp-id');
+    const badgeEl = document.getElementById('modal-status-badge');
+
+    const formattedDate = new Date(resp.submittedAt).toLocaleString('ru-RU', {
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+
+    dateEl.textContent = 'Отправлено: ' + formattedDate;
+    idEl.textContent = 'ID отклика: ' + resp.id;
+
+    const deleteForm = document.getElementById('modal-delete-form');
+    if (deleteForm) {
+      deleteForm.action = '/admin/responses/' + resp.id + '/delete';
+    }
+
+    const currentStatus = resp.status || 'new';
+    badgeEl.textContent = STATUS_LABELS[currentStatus] || currentStatus;
+    badgeEl.className = 'text-xs px-2.5 py-0.5 rounded-full font-semibold border ' + STATUS_CLASSES[currentStatus];
+
+    contentEl.innerHTML = formQuestions.map(q => {
+      let val = resp.answers[q.id];
+      if (val === undefined || val === null || val === '') {
+        val = '<span class="text-slate-400 italic">Не заполнено</span>';
+      } else if (Array.isArray(val)) {
+        val = `<ul class="list-disc list-inside space-y-0.5">${val.map(v => `<li class="font-medium text-slate-800">${escapeHtml(v)}</li>`).join('')}</ul>`;
+      } else {
+        val = `<div class="font-medium text-slate-800 whitespace-pre-wrap">${escapeHtml(val)}</div>`;
+      }
+
+      return `
+        <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-100 space-y-1">
+          <div class="text-xs text-slate-500 font-medium">${escapeHtml(q.label)}</div>
+          <div class="text-sm text-slate-900">${val}</div>
+        </div>
+      `;
+    }).join('');
+
+    modal.classList.remove('hidden');
+  }
+
+  function closeDetailsModal() {
+    document.getElementById('details-modal').classList.add('hidden');
+  }
+
+  function escapeHtml(str) {
+    return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  }
+
+  // Close on Escape
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') closeDetailsModal();
+  });
+</script>
+
+<%- include('partials/footer') %>

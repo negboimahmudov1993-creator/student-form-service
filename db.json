@@ -1,0 +1,310 @@
+{
+  "forms": [
+    {
+      "id": "f_5314725c",
+      "title": "Опрос студентов о карьерных ожиданиях",
+      "description": "Помогите нам сделать карьерные программы для студентов еще лучше и удобнее.",
+      "category": "Опрос",
+      "author": "Анна Смирнова (HR Lead)",
+      "deadline": null,
+      "status": "active",
+      "createdAt": "2026-10-24T03:56:58.882Z",
+      "views": 1,
+      "questions": [
+        {
+          "id": "q_qv5ykrm",
+          "label": "На каком курсе вы учитесь?",
+          "type": "radio",
+          "required": true,
+          "placeholder": "",
+          "options": [
+            "1-2 курс бакалавриата",
+            "3-4 курс бакалавриата",
+            "Магистратура",
+            "Выпускник"
+          ]
+        },
+        {
+          "id": "q_gj1huix",
+          "label": "Что для вас главное при выборе стажировки?",
+          "type": "checkbox",
+          "required": true,
+          "placeholder": "",
+          "options": [
+            "Опытный ментор",
+            "Размер стипендии",
+            "Гибкий график / удаленка",
+            "Известный бренд компании"
+          ]
+        },
+        {
+          "id": "q_ksv0ytn",
+          "label": "Пожелания и комментарии",
+          "type": "textarea",
+          "required": false,
+          "placeholder": "Ваши мысли...",
+          "options": []
+        }
+      ]
+    },
+    {
+      "id": "f_58e13652",
+      "title": "Опрос студентов о карьерных ожиданиях",
+      "description": "Помогите нам сделать карьерные программы для студентов еще лучше и удобнее.",
+      "category": "Опрос",
+      "author": "Анна Смирнова (HR Lead)",
+      "deadline": null,
+      "status": "active",
+      "createdAt": "2026-10-24T03:55:05.822Z",
+      "views": 1,
+      "questions": [
+        {
+          "id": "q_elfwibz",
+          "label": "На каком курсе вы учитесь?",
+          "type": "radio",
+          "required": true,
+          "placeholder": "",
+          "options": [
+            "1-2 курс бакалавриата",
+            "3-4 курс бакалавриата",
+            "Магистратура",
+            "Выпускник"
+          ]
+        },
+        {
+          "id": "q_iwp1n4r",
+          "label": "Что для вас главное при выборе стажировки?",
+          "type": "checkbox",
+          "required": true,
+          "placeholder": "",
+          "options": [
+            "Опытный ментор",
+            "Размер стипендии",
+            "Гибкий график / удаленка",
+            "Известный бренд компании"
+          ]
+        },
+        {
+          "id": "q_wjq38fj",
+          "label": "Пожелания и комментарии",
+          "type": "textarea",
+          "required": false,
+          "placeholder": "Ваши мысли...",
+          "options": []
+        }
+      ]
+    },
+    {
+      "id": "f_30c342d5",
+      "title": "Отклик на оплачиваемую стажировку: Junior Developer",
+      "description": "Приглашаем амбициозных студентов в команду! Заполните короткую анкету о себе, ваших навыках и проектах.",
+      "category": "Стажировка",
+      "author": "Анна Смирнова (HR Lead)",
+      "deadline": null,
+      "status": "active",
+      "createdAt": "2026-10-24T03:54:45.775Z",
+      "views": 1,
+      "questions": [
+        {
+          "id": "q_hllw7xu",
+          "label": "Ваше ФИО",
+          "type": "text",
+          "required": true,
+          "placeholder": "Иванов Иван",
+          "options": []
+        },
+        {
+          "id": "q_iwrqxmt",
+          "label": "Контактный Email",
+          "type": "email",
+          "required": true,
+          "placeholder": "ivanov@example.com",
+          "options": []
+        },
+        {
+          "id": "q_qtomhl1",
+          "label": "Телефон или Telegram для связи",
+          "type": "text",
+          "required": true,
+          "placeholder": "@telegram_nick или +7 (999) 000-00-00",
+          "options": []
+        },
+        {
+          "id": "q_jw08ed3",
+          "label": "Университет и курс",
+          "type": "text",
+          "required": false,
+          "placeholder": "МГТУ, 3 курс",
+          "options": []
+        },
+        {
+          "id": "q_5sh37d8",
+          "label": "Основное технологическое направление",
+          "type": "select",
+          "required": true,
+          "placeholder": "",
+          "options": [
+            "Frontend (React/TS)",
+            "Backend (Node.js)",
+            "Mobile (React Native/Flutter)",
+            "QA/Testing"
+          ]
+        },
+        {
+          "id": "q_ll5btj4",
+          "label": "Готовы работать от 30 часов в неделю?",
+          "type": "radio",
+          "required": true,
+          "placeholder": "",
+          "options": [
+            "Да, готов(а)",
+            "Только до 20 часов"
+          ]
+        },
+        {
+          "id": "q_sewqmhv",
+          "label": "Ссылка на резюме или GitHub",
+          "type": "text",
+          "required": false,
+          "placeholder": "https://github.com/...",
+          "options": []
+        },
+        {
+          "id": "q_uy5fkow",
+          "label": "Расскажите о проекте, которым гордитесь",
+          "type": "textarea",
+          "required": false,
+          "placeholder": "Опишите ваш опыт...",
+          "options": []
+        }
+      ]
+    },
+    {
+      "id": "f_f6904b44",
+      "title": "Регистрация на Карьерный митап и Mock-интервью",
+      "description": "Практический воркшоп с тимлидами и HR ведущих IT-компаний. Разбор ошибок в резюме и пробные собеседования.",
+      "category": "Мероприятие",
+      "author": "Анна Смирнова (HR Lead)",
+      "deadline": null,
+      "status": "active",
+      "createdAt": "2026-10-24T03:50:12.001Z",
+      "views": 1,
+      "questions": [
+        {
+          "id": "q_ydbz39v",
+          "label": "Ваше имя и фамилия",
+          "type": "text",
+          "required": true,
+          "placeholder": "Анна Петрова",
+          "options": []
+        },
+        {
+          "id": "q_y4lmghr",
+          "label": "Рабочий или учебный Email",
+          "type": "email",
+          "required": true,
+          "placeholder": "anna@university.edu",
+          "options": []
+        },
+        {
+          "id": "q_q84g7ks",
+          "label": "Телеграм для добавления в чат участников",
+          "type": "text",
+          "required": true,
+          "placeholder": "@anna_p",
+          "options": []
+        },
+        {
+          "id": "q_uun9sua",
+          "label": "Интересующие темы воркшопа",
+          "type": "checkbox",
+          "required": true,
+          "placeholder": "",
+          "options": [
+            "Составление резюме без опыта",
+            "Техническое интервью по алгоритмам",
+            "Поведенческое HR-собеседование"
+          ]
+        },
+        {
+          "id": "q_swvo77p",
+          "label": "Хотите пройти пробное собеседование на сцене?",
+          "type": "radio",
+          "required": true,
+          "placeholder": "",
+          "options": [
+            "Да, готов рискнуть!",
+            "Нет, буду зрителем"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "form-career-day",
+      "title": "Регистрация на Карьерный день и Воркшоп по резюме",
+      "description": "Приглашаем студентов 2-5 курсов на интенсивный разбор реальных кейсов собеседований, mock-интервью и встречу с тимлидами разработки.\n\n- Дата проведения: 28 октября\n- Формат: Онлайн в Zoom + трансляция\n- Участие бесплатное по предварительной регистрации.",
+      "category": "Мероприятие",
+      "author": "Михаил Ковалев (Tech Lead)",
+      "status": "active",
+      "deadline": "2026-10-28T18:00",
+      "createdAt": "2026-10-21T09:15:00.000Z",
+      "views": 32,
+      "questions": [
+        {
+          "id": "c1",
+          "label": "Фамилия и Имя",
+          "type": "text",
+          "required": true,
+          "placeholder": "Анна Смирнова"
+        },
+        {
+          "id": "c2",
+          "label": "Email",
+          "type": "email",
+          "required": true,
+          "placeholder": "anna@example.com"
+        },
+        {
+          "id": "c3",
+          "label": "Какие треки вам интересны?",
+          "type": "checkbox",
+          "required": true,
+          "options": [
+            "Frontend (React / Vue)",
+            "Backend (Node.js / Go / Python)",
+            "QA & Тестирование",
+            "Product & Project Management"
+          ]
+        },
+        {
+          "id": "c4",
+          "label": "Нужна ли вам индивидуальная консультация с HR-экспертом?",
+          "type": "radio",
+          "required": true,
+          "options": [
+            "Да, хочу разобрать резюме",
+            "Нет, только послушать доклады",
+            "Пока не определился"
+          ]
+        }
+      ]
+    }
+  ],
+  "responses": [
+    {
+      "id": "resp-004",
+      "formId": "form-career-day",
+      "status": "new",
+      "submittedAt": "2026-10-21T18:02:30.000Z",
+      "answers": {
+        "c1": "Полина Белова",
+        "c2": "polina.belova@study.ru",
+        "c3": [
+          "Frontend (React / Vue)",
+          "QA & Тестирование"
+        ],
+        "c4": "Да, хочу разобрать резюме"
+      }
+    }
+  ]
+}
